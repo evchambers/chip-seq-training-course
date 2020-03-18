@@ -114,13 +114,23 @@ If you are interested in deriving the quality scores for each base then there is
 
 -----
 
-# Section 3: Quality assessment with FastQC
+# Section 3: Quality assessment
 
 [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) is a popular tool from [Babraham Institute Bioinformatics Group](https://www.bioinformatics.babraham.ac.uk/index.html) used for *quality assessment* of sequencing data. Most Bioinformatics pipelines will use FastQC, or similar tools in the first stage of the analysis. The [documentation](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/) for FastQC will help you to interpret the plots and stats produced by the tool. A traffic light system is used to alert the user's attention to possible issues. 
 
 - From the left hand tool panel in Galaxy, under *GENOMIC FILE MANIPULATION*, select *FASTQ Quality Control -> FastQC*
 - Select one of the FASTQ files as input and *Execute* the tool.
 - When the tool finishes running, you should have an HTML file in your History. Click on the eye icon to view the various quality metrics.
+
+```{bash}
+#manual for fastqc
+man fastqc
+#commands to run fastqc on our fastq files
+fastqc MCF7_FOXA1.fastq
+fastqc MCF7_ER.fastq
+fastqc MCF7_input.fastq
+```
+
 
 The most important image is whether the base quality decreases significantly over the length of the read
 
@@ -164,13 +174,17 @@ A plethora of different tools have been written to perform this task, and we wil
 
 Alignment relies on the reference genome being *indexed* so that the sequencing reads can be located more efficiently. The genome index is a highly-accessible data structure, and Galaxy includes indices for many popular genomes. 
 
-#### 1.Align the example files  
+```{bash}
+@PG ID:bowtie2 PN:bowtie2 VN:2.3.4.1 CL:"/jetstream/scratch0/main/conda/envs/mulled-v1-65d5efe4f1b69ab7166d1a5a5616adebe902133ea3e4c189d87d7de2e21ddc17/bin/bowtie2-align-s --wrapper basic-0 -p 10 -x /cvmfs/data.galaxyproject.org/byhand/hg19/hg19full/bowtie2_index/hg19full -1 input_f.fastq -2 input_r.fastq"
 
-![](media/bowtie2-tool.png)
+```
+
+
+#### 1.Align the example files  
 
 - Find the tool *NGS: Mapping* -> *Bowtie2*
   + alternatively, type `bowtie` in the search box
-- In *Is this single-end or Paired-end?* Select **Paired-end**
+- In *Is this single-end or Paired-end?* Select **Single-end**
 - Set *FastQ file #1* and *FastQ file #2* to the two fastq files you uploaded in the previous step
 - Make sure the reference genome is set to **Human (Homo sapiens)(b37):(hg19 with mtDNA replaced with rCRS): Homo_Sapiens_nuHg19_mtCRS**
 - Press *Execute*
@@ -178,12 +192,17 @@ Alignment relies on the reference genome being *indexed* so that the sequencing 
 
 The result will be a `.bam` file that we will describe in the next section. This file is not human-readable, as it is compressed. But we can convert to a readable format for illustration purposes.
 
+```{bash}
+bowtie2
+```
+
+
 #### 2. View the alignments
 
 1.  Click on the eye of the resulting file to view the alignments.
 
 
-![](media/bam-alignments.png)
+![](images/bam.png)
 
 ### About the `bam` file format
 
@@ -224,13 +243,8 @@ The first part of the header lists the names (`SN`) of the sequences (chromosome
 ```
 
 
-We also have a section where we can record the processing steps used to derive the file
-```
-@PG ID:bowtie2 PN:bowtie2 VN:2.3.4.1 CL:"/jetstream/scratch0/main/conda/envs/mulled-v1-65d5efe4f1b69ab7166d1a5a5616adebe902133ea3e4c189d87d7de2e21ddc17/bin/bowtie2-align-s --wrapper basic-0 -p 10 -x /cvmfs/data.galaxyproject.org/byhand/hg19/hg19full/bowtie2_index/hg19full -1 input_f.fastq -2 input_r.fastq"
-....
-....
 
-```
+
 
 Next is a *tab-delimited* section that describes the alignment of each sequence in detail. 
 
@@ -239,7 +253,6 @@ HWI-D00461:188:HVGY2BCXY:1:1109:3430:66266	163	13	32889826	42	108M	=	32889969	25
 
 ```
 
-![](media/sam-entry-explained.png)
 
 Column | Official Name | Brief
 ------ | -------------- | -----------
@@ -264,7 +277,7 @@ You will notice from the 3rd column that the reads are ordered according to thei
 
 An additional couple of steps have been performed after bowtie2; sorting the file according to genome position and producing an *index* file. The index file does not provide any useful information for us and cannot be viewed in Galaxy. However, we will need it later on when viewing the data in IGV. 
 
-### Dr Mark Dunning presents....Fun with flags!
+### Fun with flags!
 
 The *"flags"* in the sam file can represent useful QC information
 
@@ -278,7 +291,7 @@ The combination of any of these properties is used to derive a numeric value
 
 For instance, a particular read has a flag of 163
 
-![](media/flag-highlight.png)
+![](images/flag-highlight.png)
 
 
 ### Derivation
@@ -308,7 +321,7 @@ See also
 ### Have a CIGAR!
 
 
-![](media/cigar-highlight.png)
+![](images/cigar-highlight.png)
 
 The ***CIGAR*** (**C**ompact **I**diosyncratic **G**apped **Alignment** **R**eport) string is a way of encoding the match between a given sequence and the position it has been assigned in the genome. It is comprised by a series of letters and numbers to indicate how many consecutive bases have that mapping.
 
@@ -355,7 +368,7 @@ The output of this tool will tell you how many reads aligned to each chromosome 
 
 The preparation of a sequencing library requires *PCR* amplification of your starting material. This can lead to some DNA fragments being over-represented in your data. As our DNA fragments are formed in a random process, and relatively small compared to the number of bases to be sequenced from the genome (3Gb in humans), we tend to think the two DNA fragments that have identical starting and ending position are unlikely to have occurred due to chance. Some software, such as [Picard](http://broadinstitute.github.io/picard/) will identify such artefacts and *mark* them for attention by downstream methods. i.e. they are not completely discarded from the analysis.
 
-![](media/pcr_dups.png)
+![](images/pcr_dups.png)
 
 #### 4. Mark Duplicates with Picard
 
@@ -372,87 +385,8 @@ The preparation of a sequencing library requires *PCR* amplification of your sta
 1. Select the tool *NGS: SAMtools -> Flagstat* 
 2. In the *BAM File to Convert* box choose the bam file produced by the *mark duplicates* step
 
-#### 6. Download your bam file
-
-For the next step you will need to download the `bam` file that you produced after *marking duplicates*. To do this, you can click the floppy disk icon.
-
-![](media/download_bam.png)
-
-**Make sure that you click both Download dataset and Download bam_index**
-
-# Section 5. Visualising the aligned reads with IGV
-
-Whilst Bioinformatics tools are very powerful and allow you to perform statistical analyses and test hypotheses, there is no substitute for **looking at and exploring the data**. A trained-eye can quite quickly get a sense of the data quality before any computational analyses have been run. Furthermore, as the person requesting the sequencing, you probably know a lot about the biological context of the samples and what to expect.
-
-We will load the aligned reads that we have just created into IGV and start to get a feel for the process of variant calling
-
-1. Download IGV
-
-You can download IGV for Windows using this link 
-
-- https://software.broadinstitute.org/software/igv/download
-
-*Extract* the zip file that you have downloaded
 
 
+# Section 5: Peak Calling
 
-![](media/extract_igv.PNG)
-
-
-
-Double-Click the file `igv` to launch IGV
-
-
-
-![](media/run_igv.PNG)
-
-
-
-2. Load a reference Genome and some Data Tracks
-
-By default, IGV should load with Human genome version *hg19* already loaded. It is essential that you use the **same genome version** that the reads were aligned to. You can check / change the genome by clicking the drop-down menu in the upper-left
-
-![](media/select_genome.PNG)
-
-We can also load extra *tracks* into the browser that can help us understand our variant calls. We can load data from *dbSNP* which will tell us about common mutations that already been identified. These can be loaded via *File* -> *Load from Server..* and selecting `dbSNP 1.4.7` from the `Variation and Repeats` section
-
-![](media/available_datasets.PNG)
-
-
-3. Navigate around IGV
-
-When IGV loads up we start with a very high-level view of the genome where *all* chromosomes are visible. Such a view might be useful if we were interested in large copy-number variation across a cohort of samples. However, we are mostly interested in changes at the individual base-level which is not possible to view at this resolution. We need to navigate to a particular region of interest.
-
-Alongside the drop-down menu used to change the genome, there is a drop-down menu to select a particular chromosome and a box where we can enter text. Inside the text box we can enter a particular genome interval of interest
-
-e.g. `chr1:10,000-11,000`
-
-
-IGV should now be displaying a region on chromosome 1 from base position `10,000` to `11,000`. 
-
-![](media/zoom_region.PNG)
-
-
-At this resolution, we can start to see the *genome sequence*. Each DNA base is represented by a different colour (A = green, C = blue) and it seems that this region is highly-repetitive; comprising mostly `C` bases. We can zoom further in using the zoom control in the top right of IGV
-
-![](media/how_to_zoom.PNG)
-
-We can use the zoom control, and also move along the genome by holding down by mouse button and sliding left-and-right, to navigate to whatever genomic location we want. If we known the name of the gene we want to interrogate we can navigate directly there using the text box
-
-![](media/select_region.PNG)
-
-The text box should now update to show the coordinates of `BRCA1` (`chr17:....`). At the bottom of the screen we can now see the *gene model* for the gene `BRCA1`.  Genes are represented as lines and boxes. Lines represent intronic regions and boxes represent exonic regions. The arrows indicate the direction / strand of transcription for the gene.
-
-![](media/gene_region.PNG)
-
-4. Load the aligned reads
-
-Choose File > Load from File..., select the bam file that you downloaded from Galaxy, and click OK. Note that the bam and index files must be in the same directory for IGV to load these properly.
-
-![](media/select_bam.PNG)
-
-The main display of IGV should now update to hold tracks for the aligned reads from this bam file. It may seem like nothing is being displayed. This is because we are zoomed-out too far to be able to see the reads. **Use the zoom function and move along the genome until you get to the first exon of BRCA1**. After you have zoomed-in far enough you will start to see some grey rectangles. *These are the aligned reads*. Note that some *downsampling* may occur meaning that not all reads are displayed to reduce memory requirements.
-
-If you hover over a particular read, how will see columns from the bam file being displayed such as the mapping quality and information about the paired reads.
-
-Coloured-letters within the read indicate bases that are different to the reference genome. The entire read may be coloured differently to grey, which can indicate different things depending on how the display has been configured. For example, it can highlight paired-reads with an *insert size* different to that expected ([see here](https://software.broadinstitute.org/software/igv/interpreting_insert_size)). The display of aligned reads can be configured through the menus, as described [here](http://software.broadinstitute.org/software/igv/Preferences#Alignments). 
+# Section 6: Visualising Peaks

@@ -1,0 +1,5 @@
+samplename,description,batch,phenotype
+SRR1021787.fastq,GSM798423,MCF7_ER_1,chip
+SRR1021788.fastq,GSM798424,MCF7_ER_2,chip
+SRR1021789.fastq,GSM798425,MCF7_ER_3,chip
+SRR1021804.fastq,GSM798440,MCF7_ER_1,input
