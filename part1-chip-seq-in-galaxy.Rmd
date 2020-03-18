@@ -41,13 +41,15 @@ This morning tutorial covers the following steps in our analysis pipeline
 
 ## Introduction to chip-seq
 
-What is chip-seq data?
+Chromatin immunoprecipitation sequencing (ChIP-seq), is a technique for analysing protein interactions with DNA. Following ChIP protocols, DNA-bound protein is immunoprecipitated using a specific antibody. The bound DNA is then coprecipitated, purified, and sequenced.
 
 ![](images/szalkowski_schmid_2011.jpg)
 
 ## The data
 
-The data for this tutorial are publicly-available 
+The data for this tutorial is from a publicly-available breast cancer study showing how ER-chromatin interactions and endocrine response in breast cancer are dependent on Forkhead protein (FOXA1)
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3024537/
 
 -----
 
@@ -73,34 +75,34 @@ You can import the data by:
 1.  In the tool panel located on the left, under Basic Tools select **Get
     Data > Upload File**. Click on the **Paste/Fetch data** button on the
     bottom section of the pop-up window.
-2.  Upload the sequence data by selecting the files `JoeBlogsBRCAPanel_R1.fastq` and `JoeBlogsBRCAPanel_R2.fastq`. You don't need to specify the file type or genome build. Galaxy should be able to make a reasonable guess.
+2.  Upload the sequence data by selecting the files `MCF7_ER.fastq`, `MCF7_FOXA1.fastq` and `MCF7_input.fastq`. You don't need to specify the file type or genome build. Galaxy should be able to make a reasonable guess.
 
 
-3.  You should now have these 2 files in your history:
-    - `JoeBlogsBRCAPanel_R1.fastq`
-    - `JoeBlogsBRCAPanel_R2.fastq`
+3.  You should now have these 3 files in your history:
+    - `MCF7_ER.fastq`
+    - `MCF7_FOXA1.fastq`
+    - `MCF7_input.fastq`
     
-    # Section 2: Fastq file format
+# Section 2: Fastq file format
 
 You can view the files you just uploaded by clicking the **eye icon** the history item. The first few lines should read as follows
 
 
-**JoeBlogsBRCAPanel_R1.fastq**
+**MCF7_input.fastq**
 
 ```
-@HWI-D00461:188:HVGY2BCXY:1:1101:1363:84148/1
-TGTGTCATTTCTATTATCTTTGGAACAACCATGAATTAGTCCCTTGGGGTTTTCAAATGCTGCACACTGACTCACACATTTATTTGGTTCTGTTTTTGCCTTCCCTNN
+@SRR1021804.1.17519002
+CCTGTGTTCCTTCTAAGCTCAGTCACTGGAAAACA
 +
-DDDDDIHIIIIIHIIIIIIIIIIHIIIIIIIIIHIIIIIIHHIIIIIIIHIIIHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIHHIDHHIHC#
-```
-
-**JoeBlogsBRCAPanel_R2.fastq**
-
-```
-@HWI-D00461:188:HVGY2BCXY:1:1101:1363:84148/2
-TGGAAAGACTTTTGGGGGGGGGAGTATTTTTCTTGTTTCTGGTTTTGGTTTTTTTGATCCGGGAAAGATTTTGTTTTTTGGAGGTTGGACTTTTGGGGAGGGGAAAAN
+HHHGHHHHHHHHHHHHHHHHGHHHHHHHHHHHHHH
+@SRR1021804.1.17519003
+ATCCTCCCAATATTTTATATGTATATTTTTTACCAA
 +
-<00<<1111<1<11/0/<///</<0111DF11<<11111<11111<1/1<1D1///<<11<<</<1111<<11<DD1<//<110<11/11<0<0</0<0<<-//<<FE
+DGGEGEDDGGGDGGFHGHAHBGGGEFFDCCDAGDED
+@SRR1021804.1.17519004
+TTTCTTTTAATTTCAGTGAAATCACTTGGGCTTTGT
++
+IIIHIIIIIIIIIIHIIHIIIIIIIIIFIIEIIHHI
 ```
 
 
@@ -108,43 +110,7 @@ The first line is the unique identifier for each sequenced read. It can be used 
 
 The quality scores are [ASCII](http://ascii-code.com/) representations of how confident we are that a particular base has been called correctly. Letters that are further along the alphabet indicate higher confidence. This is important when trying to identify types of genome variation such as single base changes, but is also indicative of the overall quality of the sequencing. Different scales have been employed over time (resulting in a different set of characters appearing in the file). 
 
-
-### Deriving the Quality Score
-
-First of all, we convert the base-calling probability (p) into a `Q` score using the formula
-
-- Quality scores $$ Q = -10log_{10}p$$
-    + Q = 30, p=0.001
-    + Q = 20, p=0.01
-    + Q = 10, p=0.1
-- These numeric quantities are *encoded* as [**ASCII**](http://ascii-code.com/) code
-    + At least 33 to get to meaningful characters
-    (https://en.wikipedia.org/wiki/FASTQ_format)
-    
-![](images/phred.png)      
-
-### Quality Scores to probabilities
-
-- look-up the ASCII code for each character
-- subtract the offset to get the Q score
-- convert to a probability using the formula:-
-
-$$ p = 10^{-Q/10} $$
-
-Let's see this calculation for the first few bases of the first read in `JoeBlogsBRCAPanel_R1.fastq`; `DDDDDIHI....`
-
-Character  | Code | Minus 33 Offset | Probability
-------------- | ------------- | ------------- | -------------
-D  | 68 | 35 | 0.0003162278
-D  | 68 | 35 | 0.0003162278
-D  | 68 | 35 | 0.0003162278
-D  | 68 | 35 | 0.0003162278
-D  | 68 | 35 | 0.0003162278
-I  | 73 | 40 | 0.0001000000
-H  | 72 | 39 | 0.0001258925
-I  | 73 | 40 | 0.0001000000
-
-In practice, we don't have to convert the values as we have software that will do this automatically
+If you are interested in deriving the quality scores for each base then there is more information [here](https://en.wikipedia.org/wiki/FASTQ_format) However, in practice, we don't have to convert the values as we have software that will do this automatically
 
 -----
 
