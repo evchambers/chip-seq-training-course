@@ -389,4 +389,45 @@ The preparation of a sequencing library requires *PCR* amplification of your sta
 
 # Section 5: Peak Calling
 
+To call peaks we will use MACS2. 
+
+1. Select MACS2 *NGS: Peak calling → MACS2 callpeak* 
+2. In ChIP-seq treatment file, select the treatment bam files
+3. In ChIP-seq control file, select the input bam files
+4. In Effective genome size, select summat
+5. Execute!
+
+### Inspecting peaks
+What is in the output?
+Looking at MACS2 data we have the following numbers of peaks:
+
+XXXXXX
+
+
+Peaks data is generated in the following format: (change to our data)
+
+   1   |   2   |   3      |      4|   5| 6    |    7  |      8     |   9 | 10
+--------|------|----------|--------|----|------|------|-------------|-----|--
+chrI   |  35  |  491| MACS2_peak_1| 176| . |10.35332 |21.51081 |17.68957 |101
+chrI | 87135 | 87212 |MACS2_peak_2 |127| . | 7.71763 |15.89278 |12.78060  |26
+chrI  |92612 | 92793| MACS2_peak_3| 153| .  |9.22373 |18.72748 |15.31966  |49
+chrI| 119739| 119782| MACS2_peak_4|  78| .  |6.08885 |10.52482  |7.82302  |25
+
+
+And the columns correspond to
+
+1. Chromosome
+2. Start
+3. End
+4. Iterative id given by MACS2
+5. Integer score for display
+6. Strand (irrelevant in this case)
+7. Fold-change (fold enrichment for this peak summit against random Poisson distribution with local lambda)
+8. log10P-value (e.g., 17.68 is 1 x 10-17)
+9. log10Q-value from Benjamini–Hochberg–Yekutieli procedure
+10. Relative summit position to peak start
+
+
 # Section 6: Visualising Peaks
+
+Use IGV
