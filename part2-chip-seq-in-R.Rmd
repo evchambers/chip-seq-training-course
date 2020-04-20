@@ -1,18 +1,62 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Chip-seq in Galaxy and R"
+author: "Emily Chambers"
+date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
+output: 
+  html_notebook: 
+    toc: yes
+    toc_float: yes
+editor_options: 
+  chunk_output_type: inline
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message=FALSE)
+```
+# Hands-on chip-seq Analysis in Galaxy and R
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+# 1 Requirements
+Install the package "ChIPpeakAnno" from Bioconductor:
 
 ```{r}
-plot(cars)
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("ChIPpeakAnno")
+
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+# 2. Upload Data
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+Upload our MACS2 peak bed files that we downloaded from galaxy
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+library(readr)
+FOXA1_df <- read_tsv("data/FOXA1.bed", col_names = F)
+FOXA1_df
+
+ER_df <- read_tsv("data/ER.bed")
+ER_df
+```
+
+# 3. Convert peaks into a GRanges object
+A GRanges object form the GenomicRanges packages is a container for genomic locations and their associated annotations. We will use this data structure for the ChIP-seq peak coordinates.
+```{r}
+library(GenomicRanges) # load the GenomicRanges pakcage
+
+FOXA1 <- GRanges(
+  FOXA1_df$X1,
+  IRanges(FOXA1_df$X2, FOXA1_df$X3),
+  strand="*"
+)
+
+# we can add more data to each peak subsequently
+names(FOXA1) <- paste("FOXA1_peak", 1:nrow(FOXA1_df), sep="_")
+score(FOXA1) <- FOXA1_df$X8
+  
+# show the first and last lines of the GRanges object
+FOXA1
+```
+
+

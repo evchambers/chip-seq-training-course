@@ -186,7 +186,7 @@ Alignment relies on the reference genome being *indexed* so that the sequencing 
   + alternatively, type `bowtie` in the search box
 - In *Is this single-end or Paired-end?* Select **Single-end**
 - Set *FastQ file #1* and *FastQ file #2* to the two fastq files you uploaded in the previous step
-- Make sure the reference genome is set to **Human (Homo sapiens)(b37):(hg19 with mtDNA replaced with rCRS): Homo_Sapiens_nuHg19_mtCRS**
+- Make sure the reference genome is set to **Human (Homo sapiens)(b37):hg18: **
 - Press *Execute*
 - Wait!
 
@@ -347,30 +347,15 @@ e.g.
     + 15 matches following by 87 bases skipped followed by 70 matches etc.
 
 
-#### 3. Check the alignment stats
+#### 3. Post-processing
 
-We will now generate a few basic statistics about the alignment of our data
-
-1. Select the tool *NGS: SAMtools -> Flagstat* 
-2. In the *BAM File to Convert* box choose the bam file produced by bowtie2.
-
-
-The tool will also report how many ***PCR Duplicates*** have been found in the data. But as we haven't yet run any software to identify such reads, the flagstat output will show 0 reads.
-
-1. Find the tool *SAMtools -> Idxstats*
-2. In the *BAM file* dropdown select the bam file produced by bowtie2
-
-The output of this tool will tell you how many reads aligned to each chromosome in your reference genome. For our example dataset we only have reads from a small region, so shouldn't expect to see alignments to each chromosome.
-
-
-
-### About Duplicates
+###  Duplicates
 
 The preparation of a sequencing library requires *PCR* amplification of your starting material. This can lead to some DNA fragments being over-represented in your data. As our DNA fragments are formed in a random process, and relatively small compared to the number of bases to be sequenced from the genome (3Gb in humans), we tend to think the two DNA fragments that have identical starting and ending position are unlikely to have occurred due to chance. Some software, such as [Picard](http://broadinstitute.github.io/picard/) will identify such artefacts and *mark* them for attention by downstream methods. i.e. they are not completely discarded from the analysis.
 
 ![](images/pcr_dups.png)
 
-#### 4. Mark Duplicates with Picard
+#### Duplicates with Picard
 
 1. Use the tool *NGS: Picard -> MarkDuplicates*
 2. In *Select SAM/BAM dataset or dataset collection* choose the bam file produced by bowtie2.
@@ -380,54 +365,54 @@ The preparation of a sequencing library requires *PCR* amplification of your sta
 
 **Warning** the assumption about reads having the same start location being PCR duplicates falls down when we do sequencing for a very specific region of the genome. e.g. targeted sequencing from a panel of cancer genes. Running a tool to mark PCR duplicates on such data would recommend a high proportion of reads be ignored from further analysis.
   
-#### 5. (Optional) Re-run the alignment statistics
-
-1. Select the tool *NGS: SAMtools -> Flagstat* 
-2. In the *BAM File to Convert* box choose the bam file produced by the *mark duplicates* step
-
-
 
 # Section 5: Peak Calling
 
 To call peaks we will use MACS2. 
 
 1. Select MACS2 *NGS: Peak calling → MACS2 callpeak* 
-2. In ChIP-seq treatment file, select the treatment bam files
+2. In ChIP-seq treatment file, select the treatment bam files (the ones with marked duplicates) 
 3. In ChIP-seq control file, select the input bam files
-4. In Effective genome size, select summat
-5. Execute!
+4. In Effective genome size, select *H.sapiens(2.7e9)*
+5. In additional outputs check the *Scores in bedGraph files (--bdg)* box
+6. Execute!
 
 ### Inspecting peaks
-What is in the output?
-Looking at MACS2 data we have the following numbers of peaks:
+Peaks BED File
 
-XXXXXX
+The default output is the narrowPeak BED file (BED6+4 format). This contains the peak locations, together with peak summit, pvalue and qvalue. You can load it to UCSC genome browser.
 
+![](images/macs2.png)
 
-Peaks data is generated in the following format: (change to our data)
-
-   1   |   2   |   3      |      4|   5| 6    |    7  |      8     |   9 | 10
---------|------|----------|--------|----|------|------|-------------|-----|--
-chrI   |  35  |  491| MACS2_peak_1| 176| . |10.35332 |21.51081 |17.68957 |101
-chrI | 87135 | 87212 |MACS2_peak_2 |127| . | 7.71763 |15.89278 |12.78060  |26
-chrI  |92612 | 92793| MACS2_peak_3| 153| .  |9.22373 |18.72748 |15.31966  |49
-chrI| 119739| 119782| MACS2_peak_4|  78| .  |6.08885 |10.52482  |7.82302  |25
-
-
-And the columns correspond to
-
-1. Chromosome
-2. Start
-3. End
-4. Iterative id given by MACS2
-5. Integer score for display
-6. Strand (irrelevant in this case)
-7. Fold-change (fold enrichment for this peak summit against random Poisson distribution with local lambda)
-8. log10P-value (e.g., 17.68 is 1 x 10-17)
-9. log10Q-value from Benjamini–Hochberg–Yekutieli procedure
+1. Chromosome name
+2. Start position of peak
+3. End position of peak
+4. Name of peak
+5. Integer score for display in genome browser (e.g. UCSC)
+6. Strand, either "." (=no strand) or "+" or "-"
+7. Fold-change
+8. -log10pvalue
+9. -log10qvalue
 10. Relative summit position to peak start
 
+Download the NarrowPeaks files by clicking on the save icon. Save the files as MCF7_ER.bed, MCF7_FOXA1.bed.
+Download the treatment Bedgraph files by clicking on the save icon. Save the files as MCF7_ER.bedgraph and MCF7_FOXA1.bedgraph
 
-# Section 6: Visualising Peaks
 
-Use IGV
+# Section 6: Visualising Peaks (IGV viewer)
+Whilst tools like R are very powerful and allow you to perform statistical analyses and test hypotheses, there is no substitute for ***looking at the data***. A trained-eye can quite quickly get a sense of the data quality before any computational analyses have been run. Futhermore, as the person requesting the sequencing, you probably know a lot about the biological context of the samples and what to expect. 
+
+- IGV has been developed by the Broad Institute and is able to display most kinds of genomic data
+    + expression
+    + ChIP
+    + whole-genome resequencing
+    + shRNA
+    
+- It is a *Java* desktop application and can be run either locally of from the Broad website
+- To run IGV yourself you will need to agree to the license and [download the version for your OS](http://www.broadinstitute.org/software/igv/download)
+
+If you have problems running IGV, you can use the online app https://igv.org/app/.
+
+Upload the tracks we downloaded from MACS2.
+
+![](images/igv.png)
