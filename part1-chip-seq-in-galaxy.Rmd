@@ -78,10 +78,11 @@ You can import the data by:
 2.  Upload the sequence data by selecting the files `MCF7_ER.fastq`, `MCF7_FOXA1.fastq` and `MCF7_input.fastq`. You don't need to specify the file type or genome build. Galaxy should be able to make a reasonable guess.
 
 
-3.  You should now have these 3 files in your history:
+3.  You should now have these 4 files in your history:
     - `MCF7_ER.fastq`
     - `MCF7_FOXA1.fastq`
-    - `MCF7_input.fastq`
+    - `MCF7_ER_input.fastq`
+    - `MCF7_FOXA1_input.fastq`
     
 # Section 2: Fastq file format
 
