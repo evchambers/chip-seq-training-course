@@ -87,12 +87,6 @@ You can import the data by:
     - `MCF7_FOXA1_input.fastq`
     
 
-    
-<<<<<<< HEAD
-=======
-
-    
->>>>>>> 77b4533d69f7b561c8aee5ab3e06e627fb4eed15
 ## Running the practical at the command line
 
 ### On a personal laptop or desktop
