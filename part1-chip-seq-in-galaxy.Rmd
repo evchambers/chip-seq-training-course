@@ -451,6 +451,19 @@ The preparation of a sequencing library requires *PCR* amplification of your sta
 
 **Warning** the assumption about reads having the same start location being PCR duplicates falls down when we do sequencing for a very specific region of the genome. e.g. targeted sequencing from a panel of cancer genes. Running a tool to mark PCR duplicates on such data would recommend a high proportion of reads be ignored from further analysis.
   
+```{bash}
+## make link to our version of picard
+export PICARD=/usr/local/community/bioinformatics-core/picard.jar
+## load the java shared module on sharc
+module load apps/java
+
+## command to mark duplicates
+java -jar $PICARD MarkDuplicates INPUT=MCF7_FOXA1.sorted.bam OUTPUT=MCF7_FOXA1.sorted_pcrdups.bam  ASSUME_SORTED=true METRICS_FILE=MCF7_FOXA1_dups_metrics.txt VALIDATION_STRINGENCY=SILENT 
+
+## index the resulting file
+$IMAGE_BASE samtools index MCF7_FOXA1.sorted_pcrdups.bam
+```
+  
 
 # Section 5: Peak Calling
 
