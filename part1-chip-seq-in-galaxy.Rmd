@@ -80,13 +80,13 @@ You can import the data by:
 2.  Upload the sequence data by selecting the files `MCF7_ER.fastq`, `MCF7_FOXA1.fastq` and `MCF7_input.fastq`. You don't need to specify the file type or genome build. Galaxy should be able to make a reasonable guess.
 
 
-3.  You should now have these 3 files in your history:
+3.  You should now have these 4 files in your history:
     - `MCF7_ER.fastq`
     - `MCF7_FOXA1.fastq`
-    - `MCF7_input.fastq`
+    - `MCF7_ER_input.fastq`
+    - `MCF7_FOXA1_input.fastq`
     
 
-    
 ## Running the practical at the command line
 
 ### On a personal laptop or desktop
@@ -450,6 +450,19 @@ The preparation of a sequencing library requires *PCR* amplification of your sta
   + https://broadinstitute.github.io/picard/explain-flags.html
 
 **Warning** the assumption about reads having the same start location being PCR duplicates falls down when we do sequencing for a very specific region of the genome. e.g. targeted sequencing from a panel of cancer genes. Running a tool to mark PCR duplicates on such data would recommend a high proportion of reads be ignored from further analysis.
+  
+```{bash}
+## make link to our version of picard
+export PICARD=/usr/local/community/bioinformatics-core/picard.jar
+## load the java shared module on sharc
+module load apps/java
+
+## command to mark duplicates
+java -jar $PICARD MarkDuplicates INPUT=MCF7_FOXA1.sorted.bam OUTPUT=MCF7_FOXA1.sorted_pcrdups.bam  ASSUME_SORTED=true METRICS_FILE=MCF7_FOXA1_dups_metrics.txt VALIDATION_STRINGENCY=SILENT 
+
+## index the resulting file
+$IMAGE_BASE samtools index MCF7_FOXA1.sorted_pcrdups.bam
+```
   
 
 # Section 5: Peak Calling
