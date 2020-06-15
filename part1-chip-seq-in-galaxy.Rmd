@@ -204,8 +204,21 @@ You should then be able to view the fastqc plots for both the fastq files on the
 $IMAGE_BASE multiqc qc
 ```
 
+# Section 4: Trimming
 
-# Section 4: Alignment
+Based on these quality plots we may want to trim our data. Trimming removes poor quality bases that tend to occur at the end of each read. It can also remove any unwanted adapter or primer sequences left over from sequencing. Popular choices are fastx_toolit, trimmomatic and cutadapt. In this instance we are going to use cutadapt
+
+- Under *FASTA/FASTQ*, select *cutadapt*
+
+
+### Command line
+
+```{bash}
+$IMAGE_BASE cutadapt file.fastq
+```
+
+
+# Section 5: Alignment
 
 We don't really spend much time look at *fastq* files, as most of our time is spent with *aligned* reads. i.e. we have used some software to tell us whereabouts in the genome each read belongs to. This will *usually* be performed for you as part of a sequencing service, but it is good to get an appreciation of the steps involved.
 
@@ -465,7 +478,7 @@ $IMAGE_BASE samtools index MCF7_FOXA1.sorted_pcrdups.bam
 ```
   
 
-# Section 5: Peak Calling
+# Section 6: Peak Calling
 
 To call peaks we will use MACS2. 
 
@@ -508,7 +521,7 @@ $IMAGE_BASE macs2 callpeak -h
 
 ```
 
-# Section 6: Visualising Peaks (IGV viewer)
+# Section 7: Visualising Peaks (IGV viewer)
 Whilst tools like R are very powerful and allow you to perform statistical analyses and test hypotheses, there is no substitute for ***looking at the data***. A trained-eye can quite quickly get a sense of the data quality before any computational analyses have been run. Futhermore, as the person requesting the sequencing, you probably know a lot about the biological context of the samples and what to expect. 
 
 - IGV has been developed by the Broad Institute and is able to display most kinds of genomic data
