@@ -206,17 +206,24 @@ $IMAGE_BASE multiqc qc
 
 # Section 4: Trimming
 
-Based on these quality plots we may want to trim our data. Trimming removes poor quality bases that tend to occur at the end of each read. It can also remove any unwanted adapter or primer sequences left over from sequencing. Popular choices are fastx_toolit, trimmomatic and cutadapt. In this instance we are going to use cutadapt
+Based on the quality reports we may want to trim our fastq files. Trimming removes poor quality bases that tend to occur at the end of each read. It can also remove any unwanted adapter or primer sequences left over from sequencing. Popular trimming tool choices are fastx_toolit, trimmomatic and cutadapt. In this instance we are going to use trimmomatic.
 
-- Under *FASTA/FASTQ*, select *cutadapt*
+- Under *FASTQ QUALITY CONTROL*, select *trimmomatic*
+- In *Is this single-end or Paired-end?* Select **Single-end**
+- Set *FastQ file #1* and *FastQ file #2* to the two fastq files you uploaded in the previous step
+- Press *Execute*
+- Wait!
 
 
-### Command line
+### Command line (untested)
 
 ```{bash}
-$IMAGE_BASE cutadapt file.fastq
+$IMAGE_BASE trimmomatic MCF7_input.fastq
 ```
 
+### Additional steps!
+
+Go back and run the fastqc and multiqc steps on the new trimmed fastq files? Are the quality reports different?
 
 # Section 5: Alignment
 
