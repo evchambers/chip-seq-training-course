@@ -23,12 +23,10 @@ RUN ln -s /opt/sratoolkit.2.8.1-3-ubuntu64/bin/* /usr/bin/
 
 RUN pip3 install multiqc
 RUN pip3 install cython
-RUN pip3 install --user --upgrade cutadapt
+RUN pip3 install cutadapt
 RUN pip3 install numpy
 RUN pip3 install MACS2
 
-RUN chmod +x ~/.local/bin/cutadapt
-RUN ln -s ~/.local/bin/cutadapt /usr/bin/cutadapt
 
 WORKDIR /opt
 RUN wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.36.zip
